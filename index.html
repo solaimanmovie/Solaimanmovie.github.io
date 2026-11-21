@@ -46,6 +46,7 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const movies=(typeof MOVIES!=='undefined'?MOVIES:[]).map((m,i)=>({...m,id:String(i)}));
 let q='',cat='সব',sort='new';
 function gd(u){if(!/drive\.google\.com/.test(u||''))return null;const m=u.match(/\/d\/([^\/?]+)/)||u.match(/[?&]id=([^&]+)/);return m&&m[1]}
+const yt=u=>{const x=(u||'').match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/);return x&&x[1]};
 const direct=u=>/\.(mp4|webm|ogg)(\?|$)/i.test(u||'');
 const dlUrl=m=>m.dl||(gd(m.video)?`https://drive.google.com/uc?export=download&id=${gd(m.video)}`:m.video);
 const poster=(m,c='poster')=>m.poster?`<img class="${c}" src="${esc(m.poster)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=&quot;${c}&quot;>${esc((m.title||'?')[0])}</div>'">`:`<div class="${c}">${esc((m.title||'?')[0])}</div>`;
@@ -65,7 +66,8 @@ function detail(id){
   $('#modal').innerHTML=`<div class="sheet"><button class="x" id="close">✕</button><div style="clear:both"></div>${poster(m)}<div id="player"></div>
   <h2 style="margin:14px 0 0">${esc(m.title)}</h2><div class="meta">${esc(m.year)} ${m.cat?'• '+esc(m.cat):''}</div>
   <p style="line-height:1.7">${esc(m.desc)}</p>
-  <div class="acts">${m.video?`<button class="btn" id="play" data-id="${m.id}">▶ দেখুন</button>`:''}${m.video||m.dl?`<a class="btn alt" target="_blank" rel="noopener" href="${esc(dlUrl(m))}" download>⬇ ডাউনলোড</a>`:''}</div></div>`;
+  ${m.trailer&&yt(m.trailer)?`<iframe src="https://www.youtube.com/embed/${yt(m.trailer)}" allowfullscreen></iframe>`:''}
+  <div class="acts">${(m.where||[]).map(w=>`<a class="btn" target="_blank" rel="noopener" href="${esc(w.url)}">${esc(w.name)}</a>`).join('')}${m.video?`<button class="btn" id="play" data-id="${m.id}">▶ দেখুন</button>`:''}${m.video||m.dl?`<a class="btn alt" target="_blank" rel="noopener" href="${esc(dlUrl(m))}" download>⬇ ডাউনলোড</a>`:''}</div></div>`;
   $('#modal').classList.add('open');
 }
 document.addEventListener('click',e=>{
